@@ -27,6 +27,7 @@
 		<module>kafka-config</module>
 		<module>messaging</module>
 		<module>model</module>
+		<module>twitch-webhook</module>
 	</modules>
 
 	<dependencies>
