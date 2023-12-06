@@ -7,7 +7,6 @@
 		<groupId>org.innotice</groupId>
 		<artifactId>parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-		<relativePath/>
 	</parent>
 
 	<artifactId>model</artifactId>
@@ -15,5 +14,13 @@
 	<name>model</name>
 	<description>Innotice Model</description>
 	<packaging>jar</packaging>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.odendeberia</groupId>
+			<artifactId>spring-r2dbc-utils</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+	</dependencies>
 
 </project>

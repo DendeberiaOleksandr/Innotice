@@ -1,10 +1,14 @@
 package com.innotice.twitch.webhook.security.auth;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class TwitchAppCredentialsAuthorizationService implements TwitchAuthorizationService {
@@ -20,7 +24,7 @@ public class TwitchAppCredentialsAuthorizationService implements TwitchAuthoriza
     private final AccessTokenStorage accessTokenStorage;
 
     public TwitchAppCredentialsAuthorizationService(TwitchSecurityCredentials securityCredentials,
-                                                    WebClient webClient,
+                                                    @Qualifier("webClient") WebClient webClient,
                                                     AccessTokenStorage accessTokenStorage) {
         this.securityCredentials = securityCredentials;
         this.webClient = webClient;
@@ -35,13 +39,24 @@ public class TwitchAppCredentialsAuthorizationService implements TwitchAuthoriza
         }
         return webClient
                 .post()
+                .uri("https://id.twitch.tv/oauth2/token")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(BodyInserters.fromFormData(CLIENT_ID, securityCredentials.getClientId())
                         .with(CLIENT_SECRET, securityCredentials.getClientSecret())
                         .with(GRANT_TYPE, securityCredentials.getGrantType())
                 )
                 .retrieve()
-                .bodyToMono(AccessToken.class)
+                .bodyToMono(Map.class)
+                .map(map -> {
+                    long now = System.currentTimeMillis();
+                    long expiration = now + ( (int) map.get("expires_in") * 1000L );
+                    return new AccessToken(
+                            (String) map.get("access_token"),
+                            expiration,
+                            (String) map.get("token_type"),
+                            now
+                    );
+                })
                 .map(token -> {
                     accessTokenStorage.setAccessToken(token);
                     return token.getAccessToken();

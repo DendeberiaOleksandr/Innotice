@@ -1,0 +1,25 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: discord-server-resource-server
+  liquibase:
+    url: jdbc:postgresql://localhost:5432/innotice
+    user: postgres
+    password: postgres
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/innotice
+    username: postgres
+    password: postgres
+org:
+  innotice:
+    security:
+      secretHeader: jsC48ISRNZae14mtDN8ABWI1XcoAAh
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    preferIpAddress: true

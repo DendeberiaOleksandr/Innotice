@@ -1,0 +1,23 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: twitch-webhook
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    preferIpAddress: true
+
+org:
+  innotice:
+    security:
+      secretHeader: jsC48ISRNZae14mtDN8ABWI1XcoAAh
+    twitch:
+      auth:
+        client:
+          id: c20cdvoqk462p0a8kmbgxn6pkiivfl
+          secret: u1lz5eizb474vbpr5uajo2sgt7u5ji

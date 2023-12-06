@@ -1,0 +1,13 @@
+spring:
+  liquibase:
+    url: jdbc:postgresql://localhost:5432/innotice-discord-servers
+    user: postgres
+    password: postgres
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/innotice-discord-servers
+    username: postgres
+    password: postgres
+com:
+  innotice:
+    security:
+      secretHeader: jsC48ISRNZae14mtDN8ABWI1XcoAAh
