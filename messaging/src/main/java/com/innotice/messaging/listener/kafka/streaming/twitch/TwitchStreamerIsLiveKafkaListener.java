@@ -1,6 +1,5 @@
 package com.innotice.messaging.listener.kafka.streaming.twitch;
 
-import com.innotice.kafka.config.topic.streaming.twitch.KafkaTwitchStreamingTopicConfig;
 import com.innotice.messaging.listener.ListenerPostProcessor;
 import com.innotice.messaging.listener.kafka.AbstractKafkaListener;
 import com.innotice.model.messaging.stream.twitch.TwitchStreamerIsLiveMessage;
