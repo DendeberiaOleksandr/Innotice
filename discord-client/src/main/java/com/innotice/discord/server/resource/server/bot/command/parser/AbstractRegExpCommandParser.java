@@ -1,4 +1,4 @@
-package com.innotice.discord.server.resource.server.bot.command.resolver;
+package com.innotice.discord.server.resource.server.bot.command.parser;
 
 import com.innotice.discord.server.resource.server.bot.command.Command;
 
