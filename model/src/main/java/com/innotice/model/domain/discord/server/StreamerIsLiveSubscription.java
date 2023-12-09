@@ -13,5 +13,7 @@ public class StreamerIsLiveSubscription {
 
     private Long streamerId;
     private String channelName;
+    private String channelUrl;
+    private Long discordChatId;
 
 }

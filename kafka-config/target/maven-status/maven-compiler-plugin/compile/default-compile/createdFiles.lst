@@ -1,0 +1,5 @@
+com\innotice\kafka\config\producer\KafkaProducerConfig.class
+com\innotice\kafka\config\consumer\KafkaConsumerConfig.class
+com\innotice\kafka\config\KafkaProperties.class
+com\innotice\kafka\config\KafkaAdminConfig.class
+com\innotice\kafka\config\topic\streaming\twitch\KafkaTwitchStreamingTopicConfig.class

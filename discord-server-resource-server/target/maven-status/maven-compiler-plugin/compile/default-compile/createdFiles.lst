@@ -1,0 +1,10 @@
+com\innotice\discord\server\resource\server\dao\DiscordServerFilter$DiscordServerFilterBuilder.class
+com\innotice\discord\server\resource\server\service\DiscordServerReactiveService.class
+com\innotice\discord\server\resource\server\dao\DiscordServerRepositoryImpl$DiscordServerRow$DiscordServerRowBuilder.class
+com\innotice\discord\server\resource\server\dao\DiscordServerRepositoryImpl$DiscordServerRow.class
+com\innotice\discord\server\resource\server\DiscordServerResourceServerApplication.class
+com\innotice\discord\server\resource\server\dao\DiscordServerFilter.class
+com\innotice\discord\server\resource\server\service\DiscordServerReactiveServiceImpl.class
+com\innotice\discord\server\resource\server\api\DiscordServerController.class
+com\innotice\discord\server\resource\server\dao\DiscordServerRepository.class
+com\innotice\discord\server\resource\server\dao\DiscordServerRepositoryImpl.class

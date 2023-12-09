@@ -1,0 +1,4 @@
+com\innotice\security\microservice\web\SecretWebClientConfig.class
+com\innotice\security\microservice\SecretHeaderAuthorizationFilter.class
+com\innotice\security\microservice\SecretHeaderProperties.class
+com\innotice\security\microservice\SecuredMicroserviceConfig.class

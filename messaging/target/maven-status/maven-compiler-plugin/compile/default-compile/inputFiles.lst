@@ -1,0 +1,12 @@
+C:\Users\oleks\Documents\Project\Innotice\messaging\src\main\java\com\innotice\messaging\publisher\kafka\AbstractMessageKafkaPublisher.java
+C:\Users\oleks\Documents\Project\Innotice\messaging\src\main\java\com\innotice\messaging\publisher\kafka\streaming\twitch\TwitchMessageKafkaPublisher.java
+C:\Users\oleks\Documents\Project\Innotice\messaging\src\main\java\com\innotice\messaging\publisher\exception\PublisherException.java
+C:\Users\oleks\Documents\Project\Innotice\messaging\src\main\java\com\innotice\messaging\listener\Listener.java
+C:\Users\oleks\Documents\Project\Innotice\messaging\src\main\java\com\innotice\messaging\publisher\kafka\streaming\twitch\TwitchStreamerIsLiveMessageKafkaPublisher.java
+C:\Users\oleks\Documents\Project\Innotice\messaging\src\main\java\com\innotice\messaging\listener\ListenerPostProcessor.java
+C:\Users\oleks\Documents\Project\Innotice\messaging\src\main\java\com\innotice\messaging\listener\kafka\AbstractKafkaListener.java
+C:\Users\oleks\Documents\Project\Innotice\messaging\src\main\java\com\innotice\messaging\listener\kafka\streaming\twitch\CreateTwitchStreamIsLiveSubscriptionKafkaListener.java
+C:\Users\oleks\Documents\Project\Innotice\messaging\src\main\java\com\innotice\messaging\listener\exception\ListenerException.java
+C:\Users\oleks\Documents\Project\Innotice\messaging\src\main\java\com\innotice\messaging\listener\kafka\streaming\twitch\TwitchStreamerIsLiveKafkaListener.java
+C:\Users\oleks\Documents\Project\Innotice\messaging\src\main\java\com\innotice\messaging\publisher\kafka\streaming\twitch\CreateTwitchStreamIsLiveSubscriptionMessageKafkaPublisher.java
+C:\Users\oleks\Documents\Project\Innotice\messaging\src\main\java\com\innotice\messaging\publisher\Publisher.java

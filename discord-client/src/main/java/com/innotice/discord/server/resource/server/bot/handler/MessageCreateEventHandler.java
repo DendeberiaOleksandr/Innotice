@@ -1,12 +1,15 @@
 package com.innotice.discord.server.resource.server.bot.handler;
 
+import com.innotice.discord.server.resource.server.bot.command.Command;
 import com.innotice.discord.server.resource.server.bot.command.parser.CommandParser;
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.Event;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,12 +17,12 @@ import java.util.stream.Collectors;
 @Component
 public class MessageCreateEventHandler implements EventHandler<MessageCreateEvent> {
 
-    private final Map<Integer, CommandParser> commandParsers;
+    private final Map<String, CommandParser> commandParsers;
 
     public MessageCreateEventHandler(List<CommandParser> commandParsers) {
         this.commandParsers = commandParsers.stream()
                 .collect(Collectors.toMap(
-                        commandParser -> calculateCommandSignatureHash(commandParser.commandSignature()),
+                        CommandParser::commandSignature,
                         commandParser -> commandParser
                 ));
     }
@@ -27,9 +30,14 @@ public class MessageCreateEventHandler implements EventHandler<MessageCreateEven
     @Override
     public Mono<Void> handle(MessageCreateEvent messageCreateEvent) {
         Message message = messageCreateEvent.getMessage();
+        BigInteger channelId = message.getChannelId().asBigInteger();
+        BigInteger serverId = message.getGuildId().map(Snowflake::asBigInteger).orElse(null);
         String messageContent = message.getContent();
-        CommandParser commandParser = commandParsers.get(calculateCommandSignatureHash(getSignatureFromMessage(messageContent)));
-        return commandParser.parse(messageContent).execute();
+        CommandParser commandParser = commandParsers.get(getSignatureFromMessage(messageContent));
+        Command command = commandParser.parse(messageContent);
+        command.setDiscordServerId(serverId);
+        command.setDiscordChatId(channelId);
+        return command.execute();
     }
 
     @Override
@@ -41,7 +49,4 @@ public class MessageCreateEventHandler implements EventHandler<MessageCreateEven
         return message.split(" ")[0];
     }
 
-    private int calculateCommandSignatureHash(String signature) {
-        return signature.hashCode();
-    }
 }

@@ -30,6 +30,7 @@
 		<module>discord-server-resource-server</module>
 		<module>security-config</module>
 		<module>discovery-server</module>
+		<module>util</module>
 	</modules>
 
 	<dependencies>
