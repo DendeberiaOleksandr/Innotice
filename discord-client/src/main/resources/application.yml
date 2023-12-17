@@ -1,1 +1,11 @@
+spring:
+  application:
+    name: discord-client
 
+server:
+  port: 8080
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URL}

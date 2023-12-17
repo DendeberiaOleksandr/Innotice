@@ -1,1 +1,11 @@
 .idea
+.env
+discord-client/target
+discord-server-resource-server/target
+discovery-server/target
+kafka-config/target
+messaging/target
+model/target
+security-config/target
+twitch-service/target
+util/target

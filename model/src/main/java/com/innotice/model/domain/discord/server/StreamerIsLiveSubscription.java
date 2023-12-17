@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigInteger;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -13,7 +15,6 @@ public class StreamerIsLiveSubscription {
 
     private Long streamerId;
     private String channelName;
-    private String channelUrl;
     private Long discordChatId;
 
 }

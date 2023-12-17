@@ -1,0 +1,23 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: twitch-service
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URL}
+
+org:
+  innotice:
+    security:
+      secretHeader: ${INNOTICE_SECRET_HEADER}
+    twitch:
+      auth:
+        client:
+          id: ${TWITCH_CLIENT_ID}
+          secret: ${TWITCH_CLIENT_SECRET}

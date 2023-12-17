@@ -5,21 +5,21 @@ spring:
   application:
     name: discord-server-resource-server
   liquibase:
-    url: jdbc:postgresql://localhost:5432/innotice
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
     user: postgres
     password: postgres
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/innotice
-    username: postgres
-    password: postgres
+    url: r2dbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
 org:
   innotice:
     security:
-      secretHeader: jsC48ISRNZae14mtDN8ABWI1XcoAAh
+      secretHeader: ${INNOTICE_SECRET_HEADER}
 
 eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka
   instance:
     preferIpAddress: true
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URL}

@@ -1,0 +1,129 @@
+version: '3'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "22181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    depends_on:
+      - kafka
+    ports:
+      - 8088:8088
+    environment:
+      KAFKA_CLUSTERS_0_NAME: innotice
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+
+  innotice-db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=innotice
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./dataset:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "innotice" ]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+
+  discovery-server:
+    container_name: innotice-discovery-server
+    build:
+      context: discovery-server
+      dockerfile: Dockerfile
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: "curl --fail --silent localhost:8761/actuator/health | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 5
+
+  discord-client:
+    container_name: innotice-discord-client
+    build:
+      context: discord-client
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - ORG_INNOTICE_KAFKA_BOOTSTRAP-SERVERS=kafka:9092
+      - ORG_INNOTICE_SECURITY_MICROSERVICE_SECURED=false
+      - ORG_INNOTICE_SECURITY_SECRETHEADER=${INNOTICE_SECRET_HEADER}
+      - ORG_INNOTICE_CLIENT_DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_URL}
+    depends_on:
+      - discovery-server
+      - kafka
+
+  discord-server-resource-server:
+    container_name: innotice-discord-server-resource-server
+    build:
+      context: discord-server-resource-server
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_LIQUIBASE_URL=jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+      - SPRING_LIQUIBASE_USER=${DB_USER}
+      - SPRING_LIQUIBASE_PASSWORD=${DB_PASSWORD}
+      - SPRING_R2DBC_URL=r2dbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+      - SPRING_R2DBC_USERNAME=${DB_USER}
+      - SPRING_R2DBC_PASSWORD=${DB_PASSWORD}
+      - ORG_INNOTICE_SECURITY_MICROSERVICE_SECURED=false
+      - ORG_INNOTICE_SECURITY_SECRETHEADER=${INNOTICE_SECRET_HEADER}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_URL}
+    depends_on:
+      - innotice-db
+    healthcheck:
+      test: "curl --fail --silent localhost:8081/actuator/health | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 5
+
+  twitch-service:
+    container_name: innotice-twitch-service
+    build:
+      context: twitch-service
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_URL}
+      - ORG_INNOTICE_KAFKA_BOOTSTRAP-SERVERS=kafka:9092
+      - ORG_INNOTICE_TWITCH_AUTH_CLIENT_ID=${TWITCH_CLIENT_ID}
+      - ORG_INNOTICE_TWITCH_AUTH_CLIENT_SECRET=${TWITCH_CLIENT_SECRET}
+      - ORG_INNOTICE_SECURITY_MICROSERVICE_SECURED=false
+      - ORG_INNOTICE_SECURITY_SECRETHEADER=${INNOTICE_SECRET_HEADER}
+    links:
+      - discord-server-resource-server
+      - discovery-server
+    depends_on:
+      - discovery-server
+      - discord-server-resource-server
+      - kafka

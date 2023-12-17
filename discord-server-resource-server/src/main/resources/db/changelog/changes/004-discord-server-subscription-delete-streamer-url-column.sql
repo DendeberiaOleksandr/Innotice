@@ -1,0 +1,1 @@
+alter table discord_server_streamer_is_live_subscription drop column streamer_url;

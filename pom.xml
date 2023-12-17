@@ -26,11 +26,11 @@
 		<module>kafka-config</module>
 		<module>messaging</module>
 		<module>model</module>
-		<module>twitch-webhook</module>
 		<module>discord-server-resource-server</module>
 		<module>security-config</module>
 		<module>discovery-server</module>
 		<module>util</module>
+		<module>twitch-service</module>
 	</modules>
 
 	<dependencies>
