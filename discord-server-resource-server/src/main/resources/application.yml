@@ -1,7 +1,11 @@
 server:
   port: 8081
 
+
 spring:
+  kafka:
+    consumer:
+      enable-auto-commit: true
   application:
     name: discord-server-resource-server
 

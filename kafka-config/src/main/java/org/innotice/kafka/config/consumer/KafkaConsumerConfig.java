@@ -19,7 +19,6 @@ public class KafkaConsumerConfig {
     public ConsumerFactory<String, String> consumerFactory(KafkaProperties kafkaProperties) {
         return new DefaultKafkaConsumerFactory<>(Map.of(
                 ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers(),
-                ConsumerConfig.GROUP_ID_CONFIG, kafkaProperties.getGroupId(),
                 ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
                 ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class
         ));

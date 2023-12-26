@@ -1,6 +1,9 @@
 spring:
   application:
     name: discord-client
+  kafka:
+    consumer:
+      enable-auto-commit: true
 
 server:
   port: 8080

@@ -9,3 +9,4 @@ model/target
 security-config/target
 twitch-service/target
 util/target
+web-services/target

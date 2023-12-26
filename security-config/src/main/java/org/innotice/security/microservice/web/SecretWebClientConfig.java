@@ -12,12 +12,16 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class SecretWebClientConfig {
 
     private final SecretHeaderProperties secretHeaderProperties;
+    private final WebClientRequestLoggingFilterFunction webClientRequestLoggingFilterFunction;
+    private final WebClientResponseLoggingFilterFunction webClientResponseLoggingFilterFunction;
 
     @LoadBalanced
     @Bean
     public WebClient.Builder webClientBuilder() {
         return WebClient
                 .builder()
+                .filter(webClientRequestLoggingFilterFunction)
+                .filter(webClientRequestLoggingFilterFunction)
                 .defaultHeader(secretHeaderProperties.getHeaderName(), secretHeaderProperties.getSecret());
     }
 

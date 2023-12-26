@@ -1,0 +1,1 @@
+alter table discord_server_streamer_is_live_subscription add column is_subscribed bool not null default false;

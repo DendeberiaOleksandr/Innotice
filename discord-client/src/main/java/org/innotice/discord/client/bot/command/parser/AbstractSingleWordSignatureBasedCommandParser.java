@@ -6,8 +6,8 @@ import java.util.Arrays;
 
 public abstract class AbstractSingleWordSignatureBasedCommandParser<T extends Command> implements CommandParser<T> {
 
-    protected String[] parseCommandData(String command) {
-        return (String[]) Arrays.stream(command.split(" ")).skip(1).toArray();
+    protected String parseCommandData(String command) {
+        return command.split(" ")[1];
     }
 
 }

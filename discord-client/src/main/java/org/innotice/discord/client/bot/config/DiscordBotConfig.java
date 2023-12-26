@@ -1,11 +1,11 @@
 package org.innotice.discord.client.bot.config;
 
+import discord4j.core.GatewayDiscordClient;
 import org.innotice.discord.client.bot.handler.EventHandler;
 import discord4j.core.DiscordClient;
 import discord4j.core.event.domain.Event;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.rest.RestClient;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,16 +30,11 @@ public class DiscordBotConfig {
 
     @Bean
     public DiscordClient discordClient(DiscordBotProperties discordBotProperties) {
-        return DiscordClient.create(discordBotProperties.getToken());
-    }
-
-    @Autowired
-    public void configGateway(DiscordClient discordClient) {
-        discordClient.withGateway(gatewayDiscordClient ->
-                gatewayDiscordClient.on(
-                       MessageCreateEvent.class, event -> getEventHandler(event.getClass()).handle(event)
-                )
-        ).block();
+        DiscordClient discordClient = DiscordClient.create(discordBotProperties.getToken());
+        GatewayDiscordClient gateway = discordClient.login().block();
+        gateway.on(MessageCreateEvent.class)
+                .subscribe(event -> getEventHandler(event.getClass()).handle(event).subscribe());
+        return discordClient;
     }
 
     private EventHandler getEventHandler(Class<? extends Event> eventType) {

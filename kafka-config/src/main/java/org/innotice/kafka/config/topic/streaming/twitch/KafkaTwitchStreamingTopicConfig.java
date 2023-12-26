@@ -11,12 +11,12 @@ public class KafkaTwitchStreamingTopicConfig {
 
     @Bean
     public NewTopic twitchStreamerIsLiveTopic() {
-        return new NewTopic(TWITCH_STREAMER_IS_LIVE_TOPIC, 1, (short) 1);
+        return new NewTopic(TWITCH_STREAMER_IS_LIVE_TOPIC, 5, (short) 1);
     }
 
     @Bean
     public NewTopic createTwitchStreamIsLiveSubscription() {
-        return new NewTopic(CREATE_TWITCH_STREAM_IS_LIVE_SUBSCRIPTION_TOPIC, 1, (short) 1);
+        return new NewTopic(CREATE_TWITCH_STREAM_IS_LIVE_SUBSCRIPTION_TOPIC, 5, (short) 1);
     }
 
 }

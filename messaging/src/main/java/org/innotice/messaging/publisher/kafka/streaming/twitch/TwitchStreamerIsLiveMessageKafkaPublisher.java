@@ -1,13 +1,11 @@
 package org.innotice.messaging.publisher.kafka.streaming.twitch;
 
-import com.innotice.model.messaging.stream.twitch.TwitchStreamerIsLiveMessage;
+import org.innotice.messaging.message.stream.twitch.TwitchStreamerIsLiveMessage;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
-
-import static org.innotice.kafka.config.topic.streaming.twitch.KafkaTwitchStreamingTopicConfig.TWITCH_STREAMER_IS_LIVE_TOPIC;
 
 @Component
 public class TwitchStreamerIsLiveMessageKafkaPublisher extends TwitchMessageKafkaPublisher<TwitchStreamerIsLiveMessage>{

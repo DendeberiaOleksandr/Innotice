@@ -1,8 +1,10 @@
 package org.innotice.discord.server.resource.service;
 
+import com.innotice.model.domain.discord.server.DiscordServerFilter;
 import org.innotice.discord.server.resource.dao.DiscordServerRepository;
 import com.innotice.model.domain.discord.server.DiscordServer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -25,6 +27,11 @@ public class DiscordServerReactiveServiceImpl implements DiscordServerReactiveSe
     }
 
     @Override
+    public Flux<DiscordServer> findAll(DiscordServerFilter filter) {
+        return discordServerRepository.findAll(filter);
+    }
+
+    @Override
     public Flux<DiscordServer> findAllById(Set<Long> ids) {
         return discordServerRepository.findAllById(ids);
     }
@@ -36,7 +43,14 @@ public class DiscordServerReactiveServiceImpl implements DiscordServerReactiveSe
 
     @Override
     public Mono<DiscordServer> save(DiscordServer discordServer) {
+        log.info("save: {}", discordServer);
         return discordServerRepository.save(discordServer);
+    }
+
+    @Override
+    public Mono<DiscordServer> upsert(DiscordServer discordServer) {
+        log.info("upsert: {}", discordServer);
+        return discordServerRepository.upsert(discordServer);
     }
 
     @Override
@@ -52,5 +66,11 @@ public class DiscordServerReactiveServiceImpl implements DiscordServerReactiveSe
     @Override
     public Mono<Void> deleteById(Long id) {
         return discordServerRepository.delete(id);
+    }
+
+    @Override
+    public Mono<Boolean> isSubscriptionExist(Long discordServerId, Long discordChannelId, Long streamerId) {
+        return findAll(new DiscordServerFilter(discordServerId, null, Set.of(discordChannelId), Set.of(streamerId)))
+                .hasElements();
     }
 }

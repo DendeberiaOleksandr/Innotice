@@ -1,5 +1,6 @@
 package org.innotice.twitch.service.security;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class TwitchAppCredentialsAuthorizationService implements TwitchAuthorizationService {
 
     private static final String API = "https://id.twitch.tv/oauth2/token";

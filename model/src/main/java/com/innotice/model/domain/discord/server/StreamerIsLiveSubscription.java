@@ -14,7 +14,8 @@ import java.math.BigInteger;
 public class StreamerIsLiveSubscription {
 
     private Long streamerId;
-    private String channelName;
+    private String streamerName;
     private Long discordChatId;
+    private boolean isSubscribed;
 
 }

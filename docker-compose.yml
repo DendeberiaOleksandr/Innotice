@@ -7,6 +7,8 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "22181:2181"
+    networks:
+      - innotice_network
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -22,6 +24,8 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
+    networks:
+      - innotice_network
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -33,6 +37,8 @@ services:
       KAFKA_CLUSTERS_0_NAME: innotice
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
       KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    networks:
+      - innotice_network
 
   innotice-db:
     image: postgres
@@ -50,6 +56,8 @@ services:
       interval: 30s
       timeout: 60s
       retries: 5
+    networks:
+      - innotice_network
 
   discovery-server:
     container_name: innotice-discovery-server
@@ -63,6 +71,8 @@ services:
       interval: 20s
       timeout: 5s
       retries: 5
+    networks:
+      - innotice_network
 
   discord-client:
     container_name: innotice-discord-client
@@ -80,6 +90,8 @@ services:
     depends_on:
       - discovery-server
       - kafka
+    networks:
+      - innotice_network
 
   discord-server-resource-server:
     container_name: innotice-discord-server-resource-server
@@ -98,6 +110,7 @@ services:
       - ORG_INNOTICE_SECURITY_MICROSERVICE_SECURED=false
       - ORG_INNOTICE_SECURITY_SECRETHEADER=${INNOTICE_SECRET_HEADER}
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_URL}
+      - ORG_INNOTICE_KAFKA_BOOTSTRAP-SERVERS=kafka:9092
     depends_on:
       - innotice-db
     healthcheck:
@@ -105,6 +118,8 @@ services:
       interval: 20s
       timeout: 5s
       retries: 5
+    networks:
+      - innotice_network
 
   twitch-service:
     container_name: innotice-twitch-service
@@ -127,3 +142,9 @@ services:
       - discovery-server
       - discord-server-resource-server
       - kafka
+    networks:
+      - innotice_network
+
+networks:
+  innotice_network:
+    driver: bridge

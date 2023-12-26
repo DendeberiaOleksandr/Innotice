@@ -1,6 +1,6 @@
 package org.innotice.messaging.listener;
 
-import com.innotice.model.messaging.Message;
+import org.innotice.messaging.message.Message;
 import reactor.core.publisher.Mono;
 
 public interface ListenerPostProcessor<T extends Message> {

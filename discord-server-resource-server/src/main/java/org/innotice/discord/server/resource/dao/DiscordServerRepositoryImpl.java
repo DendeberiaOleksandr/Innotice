@@ -1,6 +1,7 @@
 package org.innotice.discord.server.resource.dao;
 
 import com.innotice.model.domain.discord.server.DiscordServer;
+import com.innotice.model.domain.discord.server.DiscordServerFilter;
 import com.innotice.model.domain.discord.server.StreamerIsLiveSubscription;
 import io.r2dbc.spi.Row;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.odendeberia.dao.AbstractRepository;
+import org.springframework.data.util.Pair;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -38,9 +40,10 @@ public class DiscordServerRepositoryImpl extends AbstractRepository<Long, Discor
         return findAll();
     }
 
-    private Flux<DiscordServer> findAll(DiscordServerFilter filter) {
+    @Override
+    public Flux<DiscordServer> findAll(DiscordServerFilter filter) {
         StringBuilder sql = new StringBuilder("""
-                        select id, added_at, streamer_id, channel_name, streamer_url, channel_id
+                        select id, added_at, streamer_id, channel_name, streamer_url, channel_id, is_subscribed
                         from discord_server ds
                         left join discord_server_streamer_is_live_subscription ds_is_live_subscription
                         on ds.id = ds_is_live_subscription.discord_server_id
@@ -53,6 +56,23 @@ public class DiscordServerRepositoryImpl extends AbstractRepository<Long, Discor
                 .flatMapMany(discordServers -> Flux.fromStream(discordServers.stream()));
     }
 
+    @Override
+    public Mono<DiscordServer> upsert(DiscordServer discordServer) {
+        log.info("upsert: {}", discordServer);
+        Long discordServerId = discordServer.getId();
+        return findById(discordServerId)
+                .hasElement()
+                .flatMap(exists -> {
+                    if (exists) {
+                        log.info("exists");
+                        return update(discordServerId, discordServer);
+                    } else {
+                        log.info("does not exist");
+                        return save(discordServer);
+                    }
+                });
+    }
+
     private Set<DiscordServer> collectDiscordServers(List<DiscordServerRow> rows) {
         Map<Long, List<DiscordServerRow>> discordServers = rows.stream()
                 .collect(Collectors.groupingBy(DiscordServerRow::getId));
@@ -62,7 +82,7 @@ public class DiscordServerRepositoryImpl extends AbstractRepository<Long, Discor
                         entry.getValue().stream()
                                 .map(discordServerRow -> new StreamerIsLiveSubscription(
                                         discordServerRow.getStreamerId(), discordServerRow.getStreamerName(),
-                                        discordServerRow.getChannelId()
+                                        discordServerRow.getChannelId(), discordServerRow.isSubscribed()
                                 ))
                                 .collect(Collectors.toSet()),
                         entry.getValue().get(0).getAddedAt()
@@ -72,7 +92,9 @@ public class DiscordServerRepositoryImpl extends AbstractRepository<Long, Discor
 
     @Override
     public Mono<DiscordServer> findById(Long id) {
-        return findAll(DiscordServerFilter.builder().id(id).build()).single();
+        log.info("findById: {}", id);
+        return findAll(DiscordServerFilter.builder().id(id).build())
+                .singleOrEmpty();
     }
 
     @Override
@@ -83,7 +105,7 @@ public class DiscordServerRepositoryImpl extends AbstractRepository<Long, Discor
                 .all()
                 .flatMap(stringObjectMap -> Flux.fromStream(discordServer.getStreamerIsLiveSubscriptions().stream()))
                 .flatMap(streamerIsLiveSubscription -> saveStreamerIsLiveSubscription(discordServer, streamerIsLiveSubscription))
-                .single();
+                .then(Mono.just(discordServer));
     }
 
     @Override
@@ -101,8 +123,10 @@ public class DiscordServerRepositoryImpl extends AbstractRepository<Long, Discor
 
     @Override
     public Mono<DiscordServer> update(Long id, DiscordServer discordServer) {
+        log.info("update: {}", discordServer);
         return deleteStreamerIsLiveSubscriptions(discordServer)
-                .flatMap(v -> saveStreamerIsLiveSubscriptions(discordServer, discordServer.getStreamerIsLiveSubscriptions()));
+                .flatMap(ds -> saveStreamerIsLiveSubscriptions(ds, ds.getStreamerIsLiveSubscriptions()))
+                .then(Mono.just(discordServer));
     }
 
     @Override
@@ -110,30 +134,36 @@ public class DiscordServerRepositoryImpl extends AbstractRepository<Long, Discor
         return deleteAll(List.of("discord_server_streamer_is_live_subscription", "discord_server"));
     }
 
-    private Mono<DiscordServer> saveStreamerIsLiveSubscriptions(DiscordServer discordServer, Set<StreamerIsLiveSubscription> subscriptions) {
+    private Mono<Void> saveStreamerIsLiveSubscriptions(DiscordServer discordServer, Set<StreamerIsLiveSubscription> subscriptions) {
+        log.info("saveStreamerIsLiveSubscriptions: {}", discordServer);
         return Flux.fromStream(subscriptions.stream())
                 .flatMap(subscription -> saveStreamerIsLiveSubscription(discordServer, subscription))
-                .then(Mono.just(discordServer));
+                .then();
     }
 
-    private Mono<DiscordServer> saveStreamerIsLiveSubscription(DiscordServer discordServer, StreamerIsLiveSubscription streamerIsLiveSubscription) {
+    private Mono<Void> saveStreamerIsLiveSubscription(DiscordServer discordServer, StreamerIsLiveSubscription streamerIsLiveSubscription) {
+        log.info("saveStreamerIsLiveSubscription: {}", discordServer);
         return databaseClient.sql("""
                         insert into discord_server_streamer_is_live_subscription 
-                        (discord_server_id, streamer_id, channel_name, channel_id)
+                        (discord_server_id, streamer_id, channel_name, channel_id, is_subscribed)
                         values
-                        (:discordServerId, :streamerId, :channelName, :channelId)
+                        (:discordServerId, :streamerId, :channelName, :channelId, :isSubscribed)
                         """)
                 .bind("discordServerId", discordServer.getId())
                 .bind("streamerId", streamerIsLiveSubscription.getStreamerId())
-                .bind("channelName", streamerIsLiveSubscription.getChannelName())
+                .bind("channelName", streamerIsLiveSubscription.getStreamerName())
                 .bind("channelId", streamerIsLiveSubscription.getDiscordChatId())
+                .bind("isSubscribed", streamerIsLiveSubscription.isSubscribed())
                 .fetch()
-                .all()
-                .then(Mono.just(discordServer));
+                .first()
+                .then();
     }
 
-    private Mono<Void> deleteStreamerIsLiveSubscriptions(DiscordServer discordServer) {
-        return unlinkNestedEntities("discord_server_streamer_is_live_subscription", "discord_server_id", discordServer.getId()).then();
+    private Mono<DiscordServer> deleteStreamerIsLiveSubscriptions(DiscordServer discordServer) {
+        log.info("deleteStreamerIsLiveSubscriptions: {}", discordServer);
+        return unlinkNestedEntities("discord_server_streamer_is_live_subscription", "discord_server_id", discordServer.getId())
+                .then(Mono.just(discordServer))
+                .switchIfEmpty(Mono.just(discordServer));
     }
 
     private Mono<Void> deleteStreamerIsLiveSubscriptions(DiscordServer discordServer, Set<Long> streamersIds) {
@@ -153,6 +183,7 @@ public class DiscordServerRepositoryImpl extends AbstractRepository<Long, Discor
         private Long streamerId;
         private String streamerName;
         private Long channelId;
+        private boolean isSubscribed;
 
         private DiscordServerRow(Row row) {
             this.id = row.get("id", Long.class);
@@ -160,6 +191,7 @@ public class DiscordServerRepositoryImpl extends AbstractRepository<Long, Discor
             this.streamerId = row.get("streamer_id", Long.class);
             this.streamerName = row.get("channel_name", String.class);
             this.channelId = row.get("channel_id", Long.class);
+            this.isSubscribed = Boolean.TRUE.equals(row.get("is_subscribed", Boolean.class));
         }
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.kafka.annotation.EnableKafka;
 @EnableKafka
 @EnableDiscoveryClient
 @SpringBootApplication(scanBasePackages = {
+		"org.innotice.discord.client",
 		"org.innotice.security.microservice",
 		"org.innotice.kafka.config",
 		"org.innotice.messaging"

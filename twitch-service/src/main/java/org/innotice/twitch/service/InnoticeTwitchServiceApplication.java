@@ -9,7 +9,8 @@ import org.springframework.web.reactive.config.EnableWebFlux;
         "org.innotice.twitch.service",
         "org.innotice.kafka.config",
         "org.innotice.messaging",
-        "org.innotice.security.microservice"
+        "org.innotice.security.microservice",
+        "org.innotice.web.services"
 })
     public class InnoticeTwitchServiceApplication {
 
