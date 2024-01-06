@@ -1,7 +1,7 @@
 org:
   innotice:
     security:
-      secretHeader: ${INNOTICE_SECRET_HEADER}
+      internalSecret: ${INNOTICE_SECRET_HEADER}
     client:
       discord:
         bot:

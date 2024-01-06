@@ -1,6 +1,6 @@
 package org.innotice.twitch.service.config;
 
-import org.innotice.security.microservice.web.WebClientRequestLoggingFilterFunction;
+import org.innotice.security.web.WebClientRequestLoggingFilterFunction;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;

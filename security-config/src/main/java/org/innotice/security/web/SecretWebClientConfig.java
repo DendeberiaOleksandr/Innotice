@@ -1,7 +1,9 @@
-package org.innotice.security.microservice.web;
+package org.innotice.security.web;
 
 import lombok.RequiredArgsConstructor;
-import org.innotice.security.microservice.SecretHeaderProperties;
+import org.innotice.security.InternalSecretProperties;
+import org.innotice.security.util.SecurityUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,9 +13,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 @RequiredArgsConstructor
 public class SecretWebClientConfig {
 
-    private final SecretHeaderProperties secretHeaderProperties;
+    private final InternalSecretProperties internalSecretProperties;
     private final WebClientRequestLoggingFilterFunction webClientRequestLoggingFilterFunction;
-    private final WebClientResponseLoggingFilterFunction webClientResponseLoggingFilterFunction;
+
+    @Value("${spring.application.name}")
+    private String applicationName;
 
     @LoadBalanced
     @Bean
@@ -21,8 +25,8 @@ public class SecretWebClientConfig {
         return WebClient
                 .builder()
                 .filter(webClientRequestLoggingFilterFunction)
-                .filter(webClientRequestLoggingFilterFunction)
-                .defaultHeader(secretHeaderProperties.getHeaderName(), secretHeaderProperties.getSecret());
+                .defaultHeader(SecurityUtils.INTERNAL_SERVICE_HEADER, applicationName)
+                .defaultHeader(SecurityUtils.AUTH_PROVIDER_HEADER, internalSecretProperties.getSecret());
     }
 
 }

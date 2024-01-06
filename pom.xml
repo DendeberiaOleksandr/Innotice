@@ -33,6 +33,7 @@
 		<module>util</module>
 		<module>twitch-service</module>
 		<module>web-services</module>
+		<module>test-util</module>
 	</modules>
 
 	<dependencies>

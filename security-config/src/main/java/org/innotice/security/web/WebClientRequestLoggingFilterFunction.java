@@ -1,4 +1,4 @@
-package org.innotice.security.microservice.web;
+package org.innotice.security.web;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -10,12 +10,10 @@ import reactor.core.publisher.Mono;
 
 @Component
 @Slf4j
-public class WebClientResponseLoggingFilterFunction implements ExchangeFilterFunction {
+public class WebClientRequestLoggingFilterFunction implements ExchangeFilterFunction {
     @Override
     public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
-        return next.exchange(request)
-                .log()
-                .flatMap(clientResponse -> clientResponse.bodyToMono(String.class)
-                            .log().map(res -> clientResponse));
+        log.info("filter: Request: {} {} Headers: {}", request.method().name(), request.url(), request.headers());
+        return next.exchange(request);
     }
 }
